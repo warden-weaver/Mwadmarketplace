@@ -1,0 +1,18 @@
+type MetaWarden @entity {
+    id: ID!
+
+    tokenID: BigInt!
+    owner: Owner!
+}
+
+type Owner @entity {
+    id: ID!
+
+    tokens: [MetaWarden!]! @derivedFrom(field: "owner")
+}
+
+type Stat @entity {
+    id: ID!
+
+    ownerCount: BigInt!
+}

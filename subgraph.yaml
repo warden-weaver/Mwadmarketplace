@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: MetaWarden
+    network: bsc
+    source:
+      address: "0xa5fdb0822bf82de3315f1766574547115e99016f"
+      abi: MetaWarden
+      startBlock: 12945560
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Owner
+      abis:
+        - name: MetaWarden
+          file: ./abis/MetaWarden.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
