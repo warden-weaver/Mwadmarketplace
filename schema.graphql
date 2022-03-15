@@ -9,10 +9,12 @@ type Owner @entity {
     id: ID!
 
     tokens: [MetaWarden!]! @derivedFrom(field: "owner")
+    assetCount: BigInt!
 }
 
 type Stat @entity {
     id: ID!
 
+    assetCount: BigInt!
     ownerCount: BigInt!
 }
