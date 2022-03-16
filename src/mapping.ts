@@ -1,6 +1,6 @@
 import { Transfer } from "../generated/MetaWarden/MetaWarden";
 import { MetaWarden, Owner, Stat } from "../generated/schema";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
 import { ZERO, ONE } from "./constant";
 
 export const getOwner = (ownerAddress: Address, stat: Stat): Owner => {
@@ -17,7 +17,7 @@ export const getOwner = (ownerAddress: Address, stat: Stat): Owner => {
 export const removeOwner = (ownerAddress: Address, stat: Stat): void => {
     let owner = Owner.load(ownerAddress.toHexString());
     if (owner !== null) {
-        owner.unset(ownerAddress.toHexString());
+        store.remove('Owner', ownerAddress.toHexString());
 
         let tmp = stat.ownerCount.minus(ONE);
         if (tmp.lt(ZERO)) {
@@ -41,7 +41,6 @@ export function handleTransfer(event: Transfer): void {
     let id = event.params.tokenId.toString();
     let metaWarden = MetaWarden.load(id);
     let stat = getStat(event.address);
-    let owner = getOwner(event.params.to, stat);
     if (metaWarden === null) {
         metaWarden = new MetaWarden(id);
 
@@ -54,26 +53,25 @@ export function handleTransfer(event: Transfer): void {
     }
 
     metaWarden.save();
-    owner.save();
-    stat.save();
 
     let prevOwner = Owner.load(event.params.from.toHexString());
-    let currentOwner = Owner.load(event.params.to.toHexString());
+    let currentOwner = getOwner(event.params.to, stat);
 
     if (prevOwner !== null) {
-        let prevOwnerAssetCount = prevOwner.assetCount;
-        if (prevOwnerAssetCount.gt(ZERO)) {
-            prevOwnerAssetCount = prevOwnerAssetCount.minus(ONE);
-            prevOwner.assetCount = prevOwnerAssetCount;
+        let tmp = prevOwner.assetCount.minus(ONE);
+        if (tmp.lt(ZERO)) {
+            tmp = ZERO
         }
 
-        if (prevOwnerAssetCount.le(ZERO)) {
+        if (tmp.equals(ZERO)) {
             removeOwner(event.params.from, stat);
+        } else {
+            prevOwner.assetCount = tmp;
+            prevOwner.save();
         }
-
-        prevOwner.save();
     }
 
     currentOwner.assetCount = currentOwner.assetCount.plus(ONE);
     currentOwner.save();
+    stat.save();
 }
