@@ -8,8 +8,8 @@ type MetaWarden @entity {
 type Owner @entity {
     id: ID!
 
-    tokens: [MetaWarden!]! @derivedFrom(field: "owner")
     assetCount: BigInt!
+    tokens: [MetaWarden!]! @derivedFrom(field: "owner")
 }
 
 type Stat @entity {
@@ -17,4 +17,20 @@ type Stat @entity {
 
     assetCount: BigInt!
     ownerCount: BigInt!
+    nftradeVolume: BigInt!
+    tofuVolume: BigInt!
+    transferCount: BigInt!
+}
+
+type Transfer @entity {
+    id: ID!
+
+    txHash: Bytes!
+    logIndex: BigInt!
+    from: Bytes!
+    to: Bytes!
+    input: Bytes!
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    dexName: String!
 }
