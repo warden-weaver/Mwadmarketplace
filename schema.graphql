@@ -19,6 +19,7 @@ type Stat @entity {
     ownerCount: BigInt!
     nftradeVolume: BigInt!
     tofuVolume: BigInt!
+    wardenExchangeVolume: BigInt!
     transferCount: BigInt!
 }
 
@@ -33,4 +34,36 @@ type Transfer @entity {
     blockNumber: BigInt!
     blockTimestamp: BigInt!
     dexName: String!
+    soldAmount: BigInt!
+}
+
+type Order @entity {
+    id: ID!
+
+    txHash: Bytes!
+    isOrderAsk: Boolean!
+    hash: Bytes!
+    taker: Bytes!
+    maker: Bytes!
+    collection: Bytes!
+    price: BigInt!
+    tokenId: BigInt!
+    amount: BigInt!
+    strategy: Bytes!
+    currency: Bytes!
+    nonce: BigInt!
+}
+
+type UsedNonce @entity {
+    id: ID!
+
+    user: Bytes!
+    nonce: BigInt!
+}
+
+type MinNonce @entity {
+    id: ID!
+
+    user: Bytes!
+    minNonce: BigInt!
 }

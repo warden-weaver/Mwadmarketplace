@@ -63,6 +63,7 @@ typings/
 .DS_Store
 
 data/
+data2/
 build/
 generated/
 

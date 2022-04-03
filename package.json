@@ -11,12 +11,13 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy warden-weaver/mwadmarketplace --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --access-token a46d5a5bd1c84a9b910a41a589f679a9",
-    "create-local": "graph create --node http://127.0.0.1:8020 warden-weaver/mwadmarketplace",
-    "remove-local": "graph remove --node http://localhost:8020/ warden-weaver/mwadmarketplace",
-    "deploy-local": "graph deploy --node http://127.0.0.1:8020 --ipfs http://localhost:5001 warden-weaver/mwadmarketplace"
+    "create-local": "graph create --node http://128.199.65.41:8020 warden-weaver/mwadmarketplace",
+    "remove-local": "graph remove --node http://128.199.65.41:8020/ warden-weaver/mwadmarketplace",
+    "deploy-local": "graph deploy --node http://128.199.65.41:8020 --ipfs http://128.199.65.41:5001 warden-weaver/mwadmarketplace"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.20.1",
-    "@graphprotocol/graph-ts": "0.20.0"
+    "@graphprotocol/graph-ts": "0.20.0",
+    "ts-node": "^10.7.0"
   }
 }

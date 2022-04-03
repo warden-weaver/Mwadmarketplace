@@ -1,12 +1,74 @@
 import { Transfer as TransferEvent } from "../generated/MetaWarden/MetaWarden";
 import { MetaWarden, Owner, Stat, Transfer } from "../generated/schema";
-import { Address, BigInt, log, store, Bytes } from "@graphprotocol/graph-ts";
+import {
+    Address,
+    BigInt,
+    log,
+    store,
+    Bytes,
+    ByteArray,
+} from "@graphprotocol/graph-ts";
 import {
     ZERO,
     ONE,
     NFTRADE_MARKET_ADDRESS,
     TOFU_MARKET_ADDRESS,
+    NFTRADE,
+    TOFU,
 } from "./constant";
+
+const chunks = (x: string): string[] => {
+    let res: string[] = [];
+    let tmp = x.slice(2);
+    while (tmp.length > 0) {
+        res.push("0x" + tmp.slice(0, 64));
+        tmp = tmp.slice(64);
+    }
+    return res;
+};
+
+const extractAmount = (input: Bytes, dexName: String): BigInt => {
+    let funcName = input.toHexString().slice(2, 10);
+    let splitedInput: string[] = chunks(input.toHexString().slice(8));
+    if (dexName === TOFU) {
+        // log.debug("¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶ {} {} {} {} {} \n", [
+        //     TOFU,
+        //     "funcName:" + funcName,
+        //     BigInt.fromI32(splitedInput.length).toString(),
+        //     funcName === "9b44d556" ? "True" : "False",
+        //     splitedInput.length >= 8 ? "True" : "False",
+        // ]);
+        if (funcName === "ba847759" && splitedInput.length >= 8) {
+            // log.debug("£££££££££££££££££  \n {} \n {} \n {}", [
+            //     "index 2: " + splitedInput[2],
+            //     "index 5: " + splitedInput[5],
+            //     "index 7: " + splitedInput[7],
+            // ]);
+            return BigInt.fromUnsignedBytes(
+                ByteArray.fromHexString(splitedInput[7]) as Bytes
+            );
+        }
+    } else if (dexName === NFTRADE) {
+        // log.debug("§§§§§§§§§§§§§§§§§§§ {} {} {} {} {} \n", [
+        //     NFTRADE,
+        //     "funcName:" + funcName,
+        //     BigInt.fromI32(splitedInput.length).toString(),
+        //     funcName === "9b44d556" ? "True" : "False",
+        //     splitedInput.length >= 8 ? "True" : "False",
+        // ]);
+        if (funcName === "9b44d556" && splitedInput.length >= 8) {
+            // log.debug("¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢  \n {} \n {} \n {}", [
+            //     "index 2: " + splitedInput[2],
+            //     "index 5: " + splitedInput[5],
+            //     "index 7: " + splitedInput[7],
+            // ]);
+            return BigInt.fromUnsignedBytes(
+                ByteArray.fromHexString(splitedInput[7]) as Bytes
+            );
+        }
+    }
+    return ZERO;
+};
 
 export const getOrCreateTransfer = (
     event: TransferEvent,
@@ -24,13 +86,25 @@ export const getOrCreateTransfer = (
         transfer.input = event.transaction.input;
         transfer.blockNumber = event.block.number;
         transfer.blockTimestamp = event.block.timestamp;
+        transfer.dexName = "";
+        transfer.soldAmount = ZERO;
 
-        if (event.transaction.to.equals(Address.fromString(NFTRADE_MARKET_ADDRESS))) {
-            transfer.dexName = "NFTRADE";
-        } else if (event.transaction.to.equals(Address.fromString(TOFU_MARKET_ADDRESS))) {
-            transfer.dexName = "TOFU";
-        } else {
-            transfer.dexName = "";
+        if (
+            event.transaction.to.equals(
+                Address.fromString(NFTRADE_MARKET_ADDRESS)
+            )
+        ) {
+            transfer.dexName = NFTRADE;
+            let tradeVol = extractAmount(event.transaction.input, NFTRADE);
+            transfer.soldAmount = tradeVol;
+            stat.nftradeVolume = stat.nftradeVolume.plus(tradeVol);
+        } else if (
+            event.transaction.to.equals(Address.fromString(TOFU_MARKET_ADDRESS))
+        ) {
+            transfer.dexName = TOFU;
+            let tradeVol = extractAmount(event.transaction.input, TOFU);
+            transfer.soldAmount = tradeVol;
+            stat.tofuVolume = stat.tofuVolume.plus(tradeVol);
         }
 
         stat.transferCount = stat.transferCount.plus(ONE);
@@ -70,6 +144,7 @@ export const getOrCreateStat = (mwadAddress: Address): Stat => {
         stat.assetCount = ZERO;
         stat.nftradeVolume = ZERO;
         stat.tofuVolume = ZERO;
+        stat.wardenExchangeVolume = ZERO;
         stat.transferCount = ZERO;
     }
     return stat as Stat;

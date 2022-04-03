@@ -15,6 +15,9 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Owner
+        - MetaWarden
+        - Stat
+        - Transfer
       abis:
         - name: MetaWarden
           file: ./abis/MetaWarden.json
@@ -23,4 +26,33 @@ dataSources:
           handler: handleTransfer
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: ./src/metaWardenMapping.ts
+  - kind: ethereum/contract
+    name: WardenMarketplace
+    network: bsc
+    source:
+      address: "0xeBfc009964efEe725823FcEe0B9C656Be6EaE191"
+      abi: WardenMarketplace
+      startBlock: 17990971
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Owner
+        - MetaWarden
+        - Stat
+        - Transfer
+      abis:
+        - name: WardenMarketplace
+          file: ./abis/WardenMarketplace.json
+      eventHandlers:
+        - event: TakerBid(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerBid
+        - event: TakerAsk(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerAsk
+        - event: CancelAllOrders(indexed address,uint256)
+          handler: handleCancelAllOrders
+        - event: CancelMultipleOrders(indexed address,uint256[])
+          handler: handleCancelMultipleOrders
+      file: ./src/wardenMarketplaceMapping.ts
