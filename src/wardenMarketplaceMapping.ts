@@ -40,6 +40,8 @@ export const handleBid = (event: TakerBid): void => {
         order.strategy = event.params.strategy;
         order.currency = event.params.currency;
         order.nonce = event.params.orderNonce;
+
+        order.save();
     }
 
     let usedNonceId =
@@ -52,6 +54,9 @@ export const handleBid = (event: TakerBid): void => {
         usedNonce = new UsedNonce(usedNonceId);
         usedNonce.user = event.params.maker;
         usedNonce.nonce = event.params.orderNonce;
+        usedNonce.block = event.block.number;
+        usedNonce.blockTimestamp = event.block.timestamp;
+        usedNonce.save();
     }
 
     let stat = getOrCreateStat(event.params.collection);
@@ -59,8 +64,6 @@ export const handleBid = (event: TakerBid): void => {
         event.params.price
     );
 
-    order.save();
-    usedNonce.save();
     stat.save();
 };
 
@@ -82,6 +85,8 @@ export const handleAsk = (event: TakerAsk): void => {
         order.strategy = event.params.strategy;
         order.currency = event.params.currency;
         order.nonce = event.params.orderNonce;
+
+        order.save();
     }
 
     let usedNonceId =
@@ -94,6 +99,9 @@ export const handleAsk = (event: TakerAsk): void => {
         usedNonce = new UsedNonce(usedNonceId)
         usedNonce.user = event.params.maker;
         usedNonce.nonce = event.params.orderNonce;
+        usedNonce.block = event.block.number;
+        usedNonce.blockTimestamp = event.block.timestamp;
+        usedNonce.save();
     }
 
     let stat = getOrCreateStat(event.params.collection);
@@ -101,8 +109,6 @@ export const handleAsk = (event: TakerAsk): void => {
         event.params.price
     );
 
-    order.save();
-    usedNonce.save();
     stat.save();
 };
 
@@ -111,10 +117,12 @@ export const handleCancelAllOrders = (event: CancelAllOrders): void => {
     let userMinNonce = MinNonce.load(minNonceId);
     if (userMinNonce === null) {
         userMinNonce = new MinNonce(minNonceId);
-
-        userMinNonce.user = event.params.user;
-        userMinNonce.minNonce = event.params.newMinNonce;
     }
+
+    userMinNonce.user = event.params.user;
+    userMinNonce.minNonce = event.params.newMinNonce;
+    userMinNonce.block = event.block.number;
+    userMinNonce.blockTimestamp = event.block.timestamp;
 
     userMinNonce.save();
 };
@@ -128,8 +136,11 @@ export const handleCancelMultipleOrders = (
         let id = event.params.user.toHexString() + "-" + nonce.toString();
         let usedNonce = UsedNonce.load(id);
         if (usedNonce === null) {
+            usedNonce = new UsedNonce(id);
             usedNonce.user = event.params.user;
             usedNonce.nonce = nonce;
+            usedNonce.block = event.block.number;
+            usedNonce.blockTimestamp = event.block.timestamp;
     
             usedNonce.save();
         }

@@ -59,6 +59,8 @@ type UsedNonce @entity {
 
     user: Bytes!
     nonce: BigInt!
+    block: BigInt!
+    blockTimestamp: BigInt!
 }
 
 type MinNonce @entity {
@@ -66,4 +68,6 @@ type MinNonce @entity {
 
     user: Bytes!
     minNonce: BigInt!
+    block: BigInt!
+    blockTimestamp: BigInt!
 }

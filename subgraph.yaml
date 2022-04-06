@@ -8,7 +8,8 @@ dataSources:
     source:
       address: "0xa5fdb0822bf82de3315f1766574547115e99016f"
       abi: MetaWarden
-      startBlock: 12945560
+      # startBlock: 12945560
+      startBlock: 112945560
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -33,7 +34,7 @@ dataSources:
     source:
       address: "0xeBfc009964efEe725823FcEe0B9C656Be6EaE191"
       abi: WardenMarketplace
-      startBlock: 17990971
+      startBlock: 17990970
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
