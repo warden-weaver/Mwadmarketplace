@@ -49,6 +49,7 @@ export const handleBid = (event: TakerBid): void => {
 
     let usedNonce = UsedNonce.load(usedNonceId);
     if (usedNonce === null) {
+        usedNonce = new UsedNonce(usedNonceId);
         usedNonce.user = event.params.maker;
         usedNonce.nonce = event.params.orderNonce;
     }
@@ -90,6 +91,7 @@ export const handleAsk = (event: TakerAsk): void => {
 
     let usedNonce = UsedNonce.load(usedNonceId);
     if (usedNonce === null) {
+        usedNonce = new UsedNonce(usedNonceId)
         usedNonce.user = event.params.maker;
         usedNonce.nonce = event.params.orderNonce;
     }
@@ -105,9 +107,14 @@ export const handleAsk = (event: TakerAsk): void => {
 };
 
 export const handleCancelAllOrders = (event: CancelAllOrders): void => {
-    let userMinNonce = MinNonce.load(event.params.user.toHexString());
-    userMinNonce.user = event.params.user;
-    userMinNonce.minNonce = event.params.newMinNonce;
+    let minNonceId = event.params.user.toHexString();
+    let userMinNonce = MinNonce.load(minNonceId);
+    if (userMinNonce === null) {
+        userMinNonce = new MinNonce(minNonceId);
+
+        userMinNonce.user = event.params.user;
+        userMinNonce.minNonce = event.params.newMinNonce;
+    }
 
     userMinNonce.save();
 };
@@ -120,9 +127,11 @@ export const handleCancelMultipleOrders = (
         let nonce = nonces[i];
         let id = event.params.user.toHexString() + "-" + nonce.toString();
         let usedNonce = UsedNonce.load(id);
-        usedNonce.user = event.params.user;
-        usedNonce.nonce = nonce;
-
-        usedNonce.save();
+        if (usedNonce === null) {
+            usedNonce.user = event.params.user;
+            usedNonce.nonce = nonce;
+    
+            usedNonce.save();
+        }
     }
 };
