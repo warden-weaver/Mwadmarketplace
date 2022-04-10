@@ -32,9 +32,9 @@ dataSources:
     name: WardenMarketplace
     network: bsc
     source:
-      address: "0xeBfc009964efEe725823FcEe0B9C656Be6EaE191"
+      address: "0x8c0c555e8c8f247ee01cb5fed2ed119dae7a39fd"
       abi: WardenMarketplace
-      startBlock: 17990970
+      startBlock: 18308457
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -49,9 +49,9 @@ dataSources:
           file: ./abis/WardenMarketplace.json
       eventHandlers:
         - event: TakerBid(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
-          handler: handleTakerBid
+          handler: handleBid
         - event: TakerAsk(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
-          handler: handleTakerAsk
+          handler: handleAsk
         - event: CancelAllOrders(indexed address,uint256)
           handler: handleCancelAllOrders
         - event: CancelMultipleOrders(indexed address,uint256[])

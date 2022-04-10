@@ -61,6 +61,8 @@ type UsedNonce @entity {
     nonce: BigInt!
     block: BigInt!
     blockTimestamp: BigInt!
+    type: String!
+    taker: Bytes
 }
 
 type MinNonce @entity {

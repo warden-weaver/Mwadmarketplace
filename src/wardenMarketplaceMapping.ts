@@ -22,7 +22,7 @@ export const getOrCreateStat = (mwadAddress: Address): Stat => {
     return stat as Stat;
 };
 
-export const handleBid = (event: TakerBid): void => {
+export function handleBid(event: TakerBid): void {
     let orderId = event.params.orderHash.toHexString();
 
     let order = Order.load(orderId);
@@ -56,6 +56,8 @@ export const handleBid = (event: TakerBid): void => {
         usedNonce.nonce = event.params.orderNonce;
         usedNonce.block = event.block.number;
         usedNonce.blockTimestamp = event.block.timestamp;
+        usedNonce.type = "SOLD";
+        usedNonce.taker = event.params.taker;
         usedNonce.save();
     }
 
@@ -67,7 +69,7 @@ export const handleBid = (event: TakerBid): void => {
     stat.save();
 };
 
-export const handleAsk = (event: TakerAsk): void => {
+export function handleAsk(event: TakerAsk): void {
     let orderId = event.params.orderHash.toHexString();
 
     let order = Order.load(orderId);
@@ -101,6 +103,8 @@ export const handleAsk = (event: TakerAsk): void => {
         usedNonce.nonce = event.params.orderNonce;
         usedNonce.block = event.block.number;
         usedNonce.blockTimestamp = event.block.timestamp;
+        usedNonce.type = "SOLD"
+        usedNonce.taker = event.params.taker;
         usedNonce.save();
     }
 
@@ -112,7 +116,7 @@ export const handleAsk = (event: TakerAsk): void => {
     stat.save();
 };
 
-export const handleCancelAllOrders = (event: CancelAllOrders): void => {
+export function handleCancelAllOrders(event: CancelAllOrders): void {
     let minNonceId = event.params.user.toHexString();
     let userMinNonce = MinNonce.load(minNonceId);
     if (userMinNonce === null) {
@@ -127,9 +131,7 @@ export const handleCancelAllOrders = (event: CancelAllOrders): void => {
     userMinNonce.save();
 };
 
-export const handleCancelMultipleOrders = (
-    event: CancelMultipleOrders
-): void => {
+export function handleCancelMultipleOrders(event: CancelMultipleOrders): void {
     let nonces = event.params.orderNonces;
     for (let i = 0; i < nonces.length; i++) {
         let nonce = nonces[i];
@@ -141,6 +143,7 @@ export const handleCancelMultipleOrders = (
             usedNonce.nonce = nonce;
             usedNonce.block = event.block.number;
             usedNonce.blockTimestamp = event.block.timestamp;
+            usedNonce.type = "CANCELLED"
     
             usedNonce.save();
         }
